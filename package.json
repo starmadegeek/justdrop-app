@@ -1,0 +1,16 @@
+{
+  "name": "justdrop-app",
+  "version": "1.0.0",
+  "description": "JustDrop File Sharing Application",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd justdrop && mvn spring-boot:run",
+    "frontend": "cd justdrop-fe && npm run dev",
+    "install-all": "cd justdrop-fe && npm install",
+    "build-frontend": "cd justdrop-fe && npm run build",
+    "build-backend": "cd justdrop && mvn clean package"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
