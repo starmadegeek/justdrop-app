@@ -1,9 +1,11 @@
 package com.starmadegeek.justdrop.exception;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -44,11 +46,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, "FILE_METADATA_NOT_FOUND");
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<Map<String, Object>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
-        return buildErrorResponse("File size exceeds the maximum allowed limit", HttpStatus.BAD_REQUEST, "FILE_SIZE_EXCEEDED");
-    }
-
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<Map<String, Object>> handleFileStorageException(FileStorageException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "FILE_STORAGE_ERROR");
@@ -56,8 +53,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        if (ex instanceof MaxUploadSizeExceededException) {
+            return buildErrorResponse("File size exceeds the maximum allowed limit", HttpStatus.BAD_REQUEST, "FILE_SIZE_EXCEEDED");
+        }
         return buildErrorResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR");
     }
+
 
     private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status, String errorCode) {
         Map<String, Object> errorResponse = new HashMap<>();
